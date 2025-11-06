@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player - Multi Device Kahoot</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Player</h1>
+            <button onclick="window.location.href='index.html'" class="home-btn">🏠 Home</button>
+        </div>
+
+        <!-- Join Screen -->
+        <div id="join-screen" class="card">
+            <h2>Join Game</h2>
+            <div class="connection-status-small">
+                <span id="player-connection-status">🌐 Multi-Device Ready</span>
+            </div>
+            <div class="form-group">
+                <label for="game-pin">Game PIN</label>
+                <input type="text" id="game-pin" placeholder="Enter 6-digit PIN" maxlength="6">
+            </div>
+            <div class="form-group">
+                <label for="player-name">Your Name</label>
+                <input type="text" id="player-name" placeholder="Enter your name">
+            </div>
+            <button onclick="joinGame()" class="success">Join Game</button>
+            
+            <div class="quick-join">
+                <h3>🚀 Quick Join URLs:</h3>
+                <p>Share these direct join links:</p>
+                <div class="quick-links" id="quick-links"></div>
+            </div>
+        </div>
+
+        <!-- Waiting Screen -->
+        <div id="waiting-screen" class="card hidden">
+            <h2>⏳ Waiting for Game to Start</h2>
+            <div class="player-info">
+                <p>You've joined as: <strong id="player-display-name"></strong></p>
+                <p>Game PIN: <strong id="display-game-pin"></strong></p>
+            </div>
+            <div class="waiting-message">
+                <div class="loading-spinner"></div>
+                <p>Waiting for the host to start the game...</p>
+                <p class="small">You can join from any device - real-time sync enabled!</p>
+            </div>
+            <div class="players-waiting">
+                <h3>Players in Lobby:</h3>
+                <div class="player-list" id="lobby-players"></div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="card hidden">
+            <div class="question-header">
+                <div class="question-number">Question <span id="q-number">1</span></div>
+                <div class="timer-large" id="game-timer">20</div>
+            </div>
+            
+            <div class="question-text" id="game-question-text">
+                Question will appear here
+            </div>
+            
+            <div class="options-container" id="game-options">
+                <!-- Options will be populated here -->
+            </div>
+            
+            <div class="answer-feedback hidden" id="answer-feedback">
+                <!-- Feedback will be shown here -->
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="card hidden">
+            <h2>🏆 Game Results</h2>
+            <div class="player-final-score">
+                <h3>Your Final Score: <span id="final-score">0</span> points</h3>
+            </div>
+            <div class="leaderboard" id="final-leaderboard">
+                <!-- Leaderboard will be populated here -->
+            </div>
+            <div class="controls">
+                <button onclick="leaveGame()" class="secondary">Leave Game</button>
+                <button onclick="playAgain()" class="success">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Live Leaderboard -->
+        <div id="live-leaderboard-panel" class="card hidden">
+            <h3>📊 Live Leaderboard</h3>
+            <div class="leaderboard-mini" id="mini-leaderboard">
+                <!-- Mini leaderboard will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/shared-storage-firebase.js"></script>
+    <script src="scripts/player.js"></script>
+
+    <script>
+        // Generate quick join URLs
+        function generateQuickLinks() {
+            const baseUrl = window.location.href;
+            const linksContainer = document.getElementById('quick-links');
+            
+            // Example quick join URLs (these would be generated dynamically in a real app)
+            linksContainer.innerHTML = `
+                <p>Share: <strong>${baseUrl}?pin=123456</strong></p>
+                <p>Or: <strong>${baseUrl}?pin=123456&name=PlayerName</strong></p>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Initializing player interface...');
+            generateQuickLinks();
+            
+            // Auto-focus on name field
+            setTimeout(() => {
+                const nameField = document.getElementById('player-name');
+                if (nameField && !nameField.value) {
+                    nameField.focus();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

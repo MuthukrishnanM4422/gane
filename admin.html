@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Host - Multi Device Kahoot</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍💼 Game Host</h1>
+            <div class="nav-buttons">
+                <button onclick="window.location.href='index.html'">🏠 Home</button>
+                <button onclick="switchTab('setup', event)" class="tab-btn active">Game Setup</button>
+                <button onclick="switchTab('players', event)" class="tab-btn">Players</button>
+                <button onclick="switchTab('control', event)" class="tab-btn">Game Control</button>
+                <button onclick="switchTab('results', event)" class="tab-btn">Results</button>
+            </div>
+        </div>
+
+        <!-- Game Setup Tab -->
+        <div id="setup" class="tab-content active">
+            <div class="card">
+                <h2>🌐 Connection Status</h2>
+                <button onclick="testConnection()" class="info">Test Multi-Device Connection</button>
+                <div id="connection-test-result"></div>
+            </div>
+
+            <div class="card">
+                <h2>Create New Game</h2>
+                <div class="form-group">
+                    <label for="game-name">Game Name</label>
+                    <input type="text" id="game-name" placeholder="Enter game name">
+                </div>
+                <button onclick="createNewGame()" class="success">Create New Game</button>
+            </div>
+
+            <div class="card">
+                <h2>Current Game</h2>
+                <div class="game-pin" id="current-game-pin">No active game</div>
+                <div class="game-info" id="game-info"></div>
+                <div class="share-section">
+                    <h3>📤 Share Game PIN:</h3>
+                    <div class="share-pin">
+                        <input type="text" id="share-pin-input" readonly>
+                        <button onclick="copyGamePin()" class="success">Copy PIN</button>
+                    </div>
+                    <p>Share this PIN with players on any device!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Add Questions</h2>
+                <div class="form-group">
+                    <label for="question-text">Question</label>
+                    <textarea id="question-text" placeholder="Enter your question"></textarea>
+                </div>
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label for="option1">Option 1</label>
+                        <input type="text" id="option1" placeholder="Option 1">
+                    </div>
+                    <div class="form-group">
+                        <label for="option2">Option 2</label>
+                        <input type="text" id="option2" placeholder="Option 2">
+                    </div>
+                    <div class="form-group">
+                        <label for="option3">Option 3</label>
+                        <input type="text" id="option3" placeholder="Option 3">
+                    </div>
+                    <div class="form-group">
+                        <label for="option4">Option 4</label>
+                        <input type="text" id="option4" placeholder="Option 4">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="correct-answer">Correct Answer</label>
+                    <select id="correct-answer">
+                        <option value="1">Option 1</option>
+                        <option value="2">Option 2</option>
+                        <option value="3">Option 3</option>
+                        <option value="4">Option 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="time-limit">Time Limit (seconds)</label>
+                    <input type="number" id="time-limit" value="20" min="5" max="60">
+                </div>
+                <button onclick="addQuestion()" class="success">Add Question</button>
+            </div>
+
+            <div class="card">
+                <h2>Questions List</h2>
+                <div id="questions-list"></div>
+            </div>
+        </div>
+
+        <!-- Players Tab -->
+        <div id="players" class="tab-content">
+            <div class="card">
+                <h2>👥 Joined Players</h2>
+                <div class="player-list" id="players-list">
+                    <p class="no-data">No players have joined yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Control Tab -->
+        <div id="control" class="tab-content">
+            <div class="card">
+                <h2>Game Control</h2>
+                <div class="controls">
+                    <button onclick="startGame()" id="start-btn" class="success">Start Game</button>
+                    <button onclick="nextQuestion()" id="next-btn" class="hidden">Next Question</button>
+                    <button onclick="endGame()" id="end-btn" class="danger hidden">End Game</button>
+                </div>
+                
+                <div id="current-question-display" class="hidden">
+                    <h3>Current Question</h3>
+                    <div class="question-display">
+                        <h4 id="current-question-text"></h4>
+                        <div class="timer" id="question-timer">20</div>
+                        <div class="options-display" id="current-options"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div id="results" class="tab-content">
+            <div class="card">
+                <h2>🏆 Live Results</h2>
+                <div class="leaderboard" id="live-leaderboard">
+                    <p class="no-data">Game not started yet</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Question Results</h2>
+                <div id="question-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/shared-storage-firebase.js"></script>
+    <script src="scripts/admin.js"></script>
+
+    <script>
+        async function testConnection() {
+            const resultElement = document.getElementById('connection-test-result');
+            resultElement.innerHTML = '<p>🧪 Testing multi-device connection...</p>';
+            
+            try {
+                const result = await sharedStorage.testConnection();
+                
+                if (result.multiDevice) {
+                    resultElement.innerHTML = `
+                        <div style="background: var(--success); color: black; padding: 15px; border-radius: 10px;">
+                            <h3>✅ MULTI-DEVICE MODE ACTIVATED!</h3>
+                            <p><strong>Players can join from any device and network</strong></p>
+                            <p>📱 Host on computer → Players join from phones</p>
+                            <p>🌐 Different networks supported</p>
+                            <p>⚡ Real-time synchronization</p>
+                        </div>
+                    `;
+                } else {
+                    resultElement.innerHTML = `
+                        <div style="background: var(--warning); color: black; padding: 15px; border-radius: 10px;">
+                            <h3>🚨 SINGLE DEVICE MODE</h3>
+                            <p>Update Firebase rules to enable multi-device</p>
+                            <p><strong>Current setup only works on single device</strong></p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultElement.innerHTML = '<p style="color: var(--warning)">⏳ Connection test failed, retrying...</p>';
+                setTimeout(testConnection, 1000);
+            }
+        }
+
+        function copyGamePin() {
+            const pinInput = document.getElementById('share-pin-input');
+            pinInput.select();
+            document.execCommand('copy');
+            alert('Game PIN copied to clipboard! Share it with players.');
+        }
+
+        // Initialize admin
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Starting admin interface...');
+            setTimeout(() => {
+                if (typeof initAdmin !== 'undefined') {
+                    initAdmin();
+                } else {
+                    console.log('⏳ Waiting for admin.js to load...');
+                    setTimeout(() => {
+                        if (typeof initAdmin !== 'undefined') {
+                            initAdmin();
+                        }
+                    }, 1000);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

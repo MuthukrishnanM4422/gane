@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahoot-Style Game - Multi Device</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Kahoot-Style Game</h1>
+            <p>Multi-Device Ready - Play across any device and network!</p>
+        </div>
+        
+        <div class="role-selection">
+            <div class="role-card" onclick="navigateTo('admin.html')">
+                <div class="role-icon">👨‍💼</div>
+                <h2>Game Host</h2>
+                <p>Create games, manage questions, and control the game flow</p>
+                <button class="role-btn">Enter as Host</button>
+            </div>
+            
+            <div class="role-card" onclick="navigateTo('player.html')">
+                <div class="role-icon">🎯</div>
+                <h2>Player</h2>
+                <p>Join games, answer questions, and compete with friends</p>
+                <button class="role-btn">Enter as Player</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🌐 Multi-Device Instructions:</h3>
+            <ol>
+                <li><strong>Host:</strong> Create a game and share the Game PIN</li>
+                <li><strong>Players:</strong> Enter the PIN from any device/network</li>
+                <li><strong>Real-time:</strong> Game syncs automatically across all devices</li>
+                <li><strong>No restrictions:</strong> Works on phones, tablets, computers</li>
+            </ol>
+            <div class="connection-status">
+                <span id="connection-status">🌐 Cloud Storage Ready - Multi-Device Enabled</span>
+                <small>Share the URL with friends to play together!</small>
+            </div>
+        </div>
+        
+        <div class="share-info">
+            <h3>📱 Share Game URL:</h3>
+            <div class="share-url">
+                <input type="text" id="game-url" readonly value="Loading...">
+                <button onclick="copyGameUrl()" class="success">Copy URL</button>
+            </div>
+            <p>Share this URL with players: <strong id="current-url"></strong></p>
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        function copyGameUrl() {
+            const urlInput = document.getElementById('game-url');
+            urlInput.select();
+            document.execCommand('copy');
+            alert('Game URL copied to clipboard!');
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.href.replace('index.html', '');
+            document.getElementById('game-url').value = currentUrl;
+            document.getElementById('current-url').textContent = currentUrl;
+            
+            const statusElement = document.getElementById('connection-status');
+            statusElement.textContent = '🌐 Multi-Device Cloud Storage Ready';
+            statusElement.style.color = 'var(--success)';
+        });
+    </script>
+</body>
+</html>
